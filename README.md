@@ -141,4 +141,5 @@ myapp-77dbdc894d-cqmrz   1/1     Running   0          9s
 delete cluster 
 ```
  kind delete cluster
+ kind delete clusters --all
 ```
