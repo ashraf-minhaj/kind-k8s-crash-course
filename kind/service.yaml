@@ -1,0 +1,17 @@
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service # service name
+spec:
+  selector:
+    app: myapp       # app name
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+  type: NodePort #LoadBalancer
+
+# In a production environment or cloud-based Kubernetes cluster, a service of type
+# LoadBalancer would typically be provided with an external IP. 
+# However, in a local development environment, it might not happen automatically.
