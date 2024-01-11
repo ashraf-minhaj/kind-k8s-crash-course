@@ -1,0 +1,15 @@
+# Layer 2 mode does not require the IPs to be bound to the network interfaces of your worker nodes. 
+# It works by responding to ARP requests on your local network directly, 
+# to give the machine’s MAC address to clients.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.2.2-192.168.2.125

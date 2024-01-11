@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend-deployment-test
+
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: testbackend
+  template:
+    metadata:
+      labels:
+        app: testbackend
+        environment: dev
+    spec:
+      containers:
+      - name: testbackend-container
+        image: ashraftheminhaj/testbackend:v1
+        imagePullPolicy: IfNotPresent        # Never, IfNotPresent, Always
+        ports:
+        - containerPort: 8080
+        readinessProbe:                      # is it ready to accept traffic?
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:                      # Is the application running? doesn't care abt startupProbe, unless initialDelaySeconds used
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 20
+        startupProbe:                      # is the container started successfully.
+          httpGet:
+            path: /health
+            port: 8080
+          failureThreshold: 30
+          # initialDelaySeconds: 
