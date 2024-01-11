@@ -15,6 +15,7 @@ kubectl apply -f deployment.yaml
 # 4. create a load balancer service
 ## 4.1. install MetalLb
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/namespace.yaml
+
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.12.1/manifests/metallb.yaml
 
 ## 4.2. create config map for metallb
@@ -25,3 +26,11 @@ kubectl get pods -n metallb-system
 
 # 5. create a service 
 kubectl apply -f service.yaml
+
+# 6. configure metallb to use network docker has created 
+docker network inspect -f '{{.IPAM.Config}}' kind
+
+output - [{172.18.0.0/16  172.18.0.1 map[]} {fc00:f853:ccd:e793::/64  fc00:f853:ccd:e793::1 map[]}]
+Now we will use IP of this range - 172.18.0.0 in service
+
+# 7,
