@@ -1,12 +1,27 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: backend-service
+  name: testbackend-service 
 spec:
   selector:
-    app: testbackend
+    app: testbackend # for NodePort, use pod labels
   ports:
     - protocol: TCP
-      port: 80
+      port: 8080
       targetPort: 8080
-  type: LoadBalancer
+  type: NodePort #LoadBalancer
+
+# kubectl expose deployment backend-deployment-test --type=NodePort --name=mbackend-deployment-test-service
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+spec:
+  selector:
+    app: testbackend  # Use the same selector as the Flask app for simplicity in this example
+  ports:
+    - protocol: TCP
+      port: 9090
+      targetPort: 9090

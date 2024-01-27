@@ -34,3 +34,8 @@ output - [{172.18.0.0/16  172.18.0.1 map[]} {fc00:f853:ccd:e793::/64  fc00:f853:
 Now we will use IP of this range - 172.18.0.0 in service
 
 # 7,
+
+## node port
+kubectl apply -f service.yaml
+get the cluster ip first
+kubectl port-forward service/testbackend-service 8080:8080

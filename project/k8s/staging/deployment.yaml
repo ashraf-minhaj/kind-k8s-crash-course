@@ -2,10 +2,17 @@ apiVersion: apps/v1
 kind: Deployment
 
 metadata:
-  name: backend-deployment-test
+  name: testbackend
+  labels:
+    app: testbackend
 
 spec:
-  replicas: 2
+  replicas: 2                 # stable set of running pods for workload
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1             # number of pods that can be created above the desired amount during update. default is 25%
+      maxUnavailable: 0       # number of pods that can be unavailable during update. default 25%
   selector:
     matchLabels:
       app: testbackend
@@ -14,28 +21,40 @@ spec:
       labels:
         app: testbackend
         environment: dev
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io.scheme: "http"
+        prometheus.io/path: "/metrics"
+        prometheus.io/port: "8080"
     spec:
       containers:
-      - name: testbackend-container
-        image: ashraftheminhaj/testbackend:v1
-        imagePullPolicy: IfNotPresent        # Never, IfNotPresent, Always
-        ports:
-        - containerPort: 8080
-        readinessProbe:                      # is it ready to accept traffic?
-          httpGet:
-            path: /ready
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
-        livenessProbe:                      # Is the application running? doesn't care abt startupProbe, unless initialDelaySeconds used
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 10
-          periodSeconds: 20
-        startupProbe:                      # is the container started successfully.
-          httpGet:
-            path: /health
-            port: 8080
-          failureThreshold: 30
-          # initialDelaySeconds: 
+        # main app container
+        - name: testbackend-container
+          image: ashraftheminhaj/testbackend:v4
+          imagePullPolicy: IfNotPresent        # Never, IfNotPresent, Always
+          ports:
+          - containerPort: 8080
+          readinessProbe:                      # is it ready to accept traffic?
+            httpGet:
+              path: /ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:                       # is the application running? doesn't care abt startupProbe, unless initialDelaySeconds used
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          startupProbe:                        # is the container started successfully.
+            httpGet:
+              path: /health
+              port: 8080
+            failureThreshold: 30
+          # initialDelaySeconds:
+
+        # sidecar container, log aggregator
+        - name: prometheus-container
+          image: prom/prometheus:v2.28.1       
+          ports:
+            - containerPort: 9090
